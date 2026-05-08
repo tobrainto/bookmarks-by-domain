@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bookmarks by Domain</title>
+<style>
+  :root {
+    --near-black: #141413;
+    --charcoal-warm: #4d4c48;
+    --dark-warm: #3d3d3a;
+    --olive-gray: #5e5d59;
+    --stone-gray: #87867f;
+    --border-cream: #f0eee6;
+    --border-warm: #e8e6dc;
+    --parchment: #f5f4ed;
+    --ivory: #faf9f5;
+    --white: #ffffff;
+    --warm-sand: #e8e6dc;
+    --terracotta: #c96442;
+    --coral: #d97757;
+    --accent-deep: #a84e33;
+    --ring-warm: #d1cfc5;
+    --ring-deep: #c2c0b6;
+    --focus-blue: #3898ec;
+    --error: #b53333;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
+    background: var(--parchment);
+    color: var(--near-black);
+    line-height: 1.60;
+    font-size: 15px;
+  }
+
+  /* ─── Container ─── */
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 48px 32px 24px;
+  }
+
+  /* ─── Header ─── */
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--parchment);
+    margin-bottom: 0;
+    padding-bottom: 20px;
+  }
+
+  /* Option 1: greeting + date merged */
+  .greeting-line {
+    font-size: 14px;
+    color: var(--olive-gray);
+    margin-bottom: 16px;
+    letter-spacing: 0.02em;
+  }
+
+  .greeting-text {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-weight: 500;
+    font-style: italic;
+  }
+
+  .greeting-sep {
+    margin: 0 8px;
+    color: var(--stone-gray);
+  }
+
+  .greeting-date {
+    color: var(--stone-gray);
+  }
+
+  /* ─── Footer ─── */
+  footer {
+    position: sticky;
+    bottom: 0;
+    margin-top: 0;
+    padding-top: 6px;
+    padding-bottom: 4px;
+    background: var(--parchment);
+    text-align: center;
+    font-size: 11px;
+    color: var(--stone-gray);
+  }
+
+  .footer-credit a {
+    color: var(--stone-gray);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .footer-credit a:hover {
+    color: var(--olive-gray);
+  }
+
+  /* ─── Search ─── */
+  .search-bar {
+    width: 100%;
+    padding: 9px 14px;
+    background: var(--white);
+    border: 1px solid var(--border-cream);
+    border-radius: 10px;
+    color: var(--near-black);
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .search-bar::placeholder {
+    color: var(--stone-gray);
+  }
+
+  .search-bar:focus {
+    border-color: var(--focus-blue);
+    box-shadow: 0px 0px 0px 1px var(--focus-blue);
+  }
+
+  /* ─── Toolbar ─── */
+  .toolbar {
+    display: flex;
+    gap: 6px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .toolbar-left {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .toolbar-right {
+    flex-shrink: 0;
+  }
+
+  .toolbar button {
+    padding: 5px 12px;
+    background: var(--warm-sand);
+    border: none;
+    border-radius: 8px;
+    color: var(--charcoal-warm);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    box-shadow:
+      0px 0px 0px 0px var(--warm-sand),
+      0px 0px 0px 1px var(--ring-warm);
+  }
+
+  .toolbar button:hover {
+    background: var(--border-warm);
+    box-shadow:
+      0px 0px 0px 0px var(--border-warm),
+      0px 0px 0px 1px var(--ring-deep);
+  }
+
+  .toolbar button:active {
+    background: var(--warm-sand);
+    box-shadow:
+      0px 0px 0px 0px var(--warm-sand),
+      inset 0px 0px 0px 1px var(--ring-deep);
+  }
+
+  .toolbar button.active {
+    background: var(--terracotta);
+    color: var(--ivory);
+    box-shadow:
+      0px 0px 0px 0px var(--terracotta),
+      0px 0px 0px 1px var(--terracotta);
+  }
+
+  .toolbar button.active:hover {
+    background: var(--accent-deep);
+    box-shadow:
+      0px 0px 0px 0px var(--accent-deep),
+      0px 0px 0px 1px var(--accent-deep);
+  }
+
+  /* ─── Scroll to top ─── */
+  .scroll-top {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 40px;
+    height: 40px;
+    background: var(--white);
+    border: 1px solid var(--border-cream);
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--dark-warm);
+    font-size: 18px;
+    box-shadow: 0px 0px 0px 1px var(--ring-warm), rgba(0,0,0,0.04) 0px 4px 12px;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.2s ease;
+    pointer-events: none;
+    z-index: 200;
+  }
+
+  .scroll-top.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .scroll-top:hover {
+    background: var(--warm-sand);
+  }
+
+  /* ─── Header Divider ─── */
+  .header-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 12px;
+    margin-bottom: 0;
+  }
+
+  /* ─── Footer Divider ─── */
+  .footer-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 24px;
+    margin-bottom: 0;
+    padding-bottom: 8px;
+  }
+
+  .divider-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border-warm);
+  }
+
+  .divider-count {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-weight: 400;
+    font-size: 18px;
+    font-style: italic;
+    color: var(--stone-gray);
+    white-space: nowrap;
+  }
+
+  .delete-all-btn {
+    display: none;
+    background: transparent;
+    border: none;
+    color: var(--error);
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+    align-items: center;
+    gap: 4px;
+    box-shadow:
+      0px 0px 0px 0px transparent,
+      0px 0px 0px 1px var(--error);
+  }
+
+  .delete-all-icon {
+    font-size: 24px;
+    line-height: 1;
+  }
+
+  .delete-all-btn:hover {
+    background: var(--error);
+    color: var(--ivory);
+    box-shadow:
+      0px 0px 0px 0px var(--error),
+      0px 0px 0px 1px var(--error);
+  }
+
+  .delete-all-btn:hover .delete-all-icon {
+    color: var(--ivory);
+  }
+
+  .delete-all-btn:active {
+    background: transparent;
+    box-shadow:
+      0px 0px 0px 0px var(--error),
+      inset 0px 0px 0px 1px var(--error);
+  }
+
+  .delete-all-btn:active .delete-all-icon {
+    color: var(--error);
+  }
+
+  /* ─── Domain Groups (grid layout) ─── */
+  .domain-columns {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .domain-group {
+    margin-bottom: 0;
+  }
+
+  details {
+    position: relative;
+    background: var(--white);
+    border: 1px solid var(--border-cream);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: rgba(0, 0, 0, 0.03) 0px 2px 8px;
+    transition: box-shadow 0.25s ease, transform 0.25s ease;
+  }
+
+  details::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--terracotta);
+    opacity: 0.6;
+  }
+
+  details:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
+    transform: translateY(-1px);
+  }
+
+  summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+    transition: background 0.15s;
+  }
+
+  summary::-webkit-details-marker { display: none; }
+
+  summary:hover {
+    background: var(--warm-sand);
+  }
+
+  .domain-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    flex: 1;
+  }
+
+  .domain-name {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-weight: 500;
+    font-size: 15px;
+    color: var(--near-black);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .domain-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .domain-count {
+    background: var(--warm-sand);
+    color: var(--dark-warm);
+    font-size: 12px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 6px;
+    min-width: 24px;
+    text-align: center;
+  }
+
+  /* ─── Bookmark List ─── */
+  .bookmark-list { list-style: none; padding: 4px 0; }
+
+  .bookmark-list li {
+    padding: 7px 16px 7px 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.1s;
+  }
+
+  .bookmark-list li:hover { background: var(--warm-sand); }
+
+  .bookmark-list li:not(:first-child) {
+    border-top: 1px solid var(--border-cream);
+  }
+
+  .favicon {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    object-fit: contain;
+    border-radius: 2px;
+  }
+
+  .bookmark-list a {
+    color: var(--stone-gray);
+    text-decoration: none;
+    font-size: 14px;
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: 65%;
+    transition: color 0.15s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .bookmark-list a:hover { color: var(--terracotta); }
+
+  .folder-tag {
+    font-size: 11px;
+    color: var(--stone-gray);
+    background: var(--warm-sand);
+    padding: 1px 6px;
+    border-radius: 4px;
+    white-space: normal;
+    flex-shrink: 0;
+    letter-spacing: 0.02em;
+    max-width: 140px;
+    overflow-wrap: break-word;
+    line-height: 1.4;
+  }
+
+  /* ─── Delete buttons ─── */
+  .delete-btn, .delete-domain-btn {
+    display: none;
+    background: transparent;
+    border: none;
+    color: var(--error);
+    cursor: pointer;
+    border-radius: 4px;
+    line-height: 1;
+    flex-shrink: 0;
+    transition: background 0.1s;
+  }
+
+  .delete-btn {
+    font-size: 18px;
+    padding: 2px 4px;
+  }
+
+  .delete-domain-btn {
+    font-size: 22px;
+    padding: 4px 8px;
+  }
+
+  .delete-btn:hover, .delete-domain-btn:hover {
+    background: rgba(181, 51, 51, 0.1);
+  }
+
+  body.delete-mode .delete-btn,
+  body.delete-mode .delete-domain-btn {
+    display: inline-flex;
+  }
+
+  /* ─── No results / Loading ─── */
+  .no-results {
+    text-align: center;
+    padding: 56px 24px;
+    color: var(--stone-gray);
+    font-size: 15px;
+    font-style: italic;
+  }
+
+  .hidden { display: none !important; }
+
+  .loading {
+    text-align: center;
+    padding: 56px 24px;
+    color: var(--olive-gray);
+    font-size: 15px;
+  }
+
+  /* ─── Summary arrow ─── */
+  summary::before {
+    content: "▸";
+    display: inline-block;
+    margin-right: 8px;
+    transition: transform 0.15s;
+    color: var(--stone-gray);
+    font-size: 14px;
+  }
+
+  details[open] > summary::before {
+    transform: rotate(90deg);
+  }
+
+  /* ─── Confirm Dialog ─── */
+  .confirm-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(20, 20, 19, 0.3);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .confirm-overlay.visible {
+    opacity: 1;
+  }
+
+  .confirm-dialog {
+    background: var(--ivory);
+    border: 1px solid var(--border-cream);
+    border-radius: 16px;
+    padding: 32px 36px 24px;
+    max-width: 420px;
+    width: 90%;
+    box-shadow: rgba(0, 0, 0, 0.08) 0px 8px 32px;
+    transform: scale(0.95) translateY(8px);
+    transition: transform 0.2s ease;
+  }
+
+  .confirm-overlay.visible .confirm-dialog {
+    transform: scale(1) translateY(0);
+  }
+
+  .confirm-title {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--near-black);
+    margin-bottom: 8px;
+  }
+
+  .confirm-message {
+    font-size: 14px;
+    color: var(--olive-gray);
+    line-height: 1.60;
+    margin-bottom: 24px;
+  }
+
+  .confirm-message strong {
+    color: var(--near-black);
+    font-weight: 600;
+  }
+
+  .confirm-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+  }
+
+  .confirm-actions button {
+    padding: 8px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .confirm-btn-cancel {
+    background: var(--warm-sand);
+    color: var(--dark-warm);
+    box-shadow:
+      0px 0px 0px 0px var(--warm-sand),
+      0px 0px 0px 1px var(--ring-warm);
+  }
+
+  .confirm-btn-cancel:hover {
+    background: var(--border-warm);
+  }
+
+  .confirm-btn-delete {
+    background: var(--terracotta);
+    color: var(--ivory);
+    box-shadow:
+      0px 0px 0px 0px var(--terracotta),
+      0px 0px 0px 1px var(--terracotta);
+  }
+
+  .confirm-btn-delete:hover {
+    background: var(--accent-deep);
+    box-shadow:
+      0px 0px 0px 0px var(--accent-deep),
+      0px 0px 0px 1px var(--accent-deep);
+  }
+
+  /* ─── Accent ─── */
+  .accent {
+    color: var(--terracotta);
+  }
+
+  /* ─── Responsive ─── */
+  @media (max-width: 480px) {
+    .container { padding: 32px 16px 60px; }
+    .header { margin-bottom: 32px; padding-bottom: 16px; }
+    .header h1 { font-size: 24px; }
+    summary { padding: 10px 12px; }
+    .domain-name { font-size: 14px; }
+    .bookmark-list li { padding: 6px 12px 6px 16px; }
+    .folder-tag { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header class="header">
+    <h1>Bookmarks by <span class="accent">Domain</span></h1>
+    <div class="greeting-line">
+      <span class="greeting-text" id="greeting1">Good evening</span>
+      <span class="greeting-sep">·</span>
+      <span class="greeting-date" id="dateDisplay1">Sunday, April 26, 2026</span>
+    </div>
+    <input type="text" class="search-bar" id="search" placeholder="Search domains, bookmark names…">
+    <div class="toolbar">
+      <div class="toolbar-left">
+        <button id="expand-all">Expand All</button>
+        <button id="collapse-all">Collapse All</button>
+        <button id="sort-alpha">A–Z</button>
+        <button id="sort-count">By Count</button>
+      </div>
+      <div class="toolbar-right">
+        <button id="delete-toggle">Delete Mode</button>
+      </div>
+    </div>
+    <div class="header-divider">
+      <div class="divider-line"></div>
+      <div class="divider-count" id="headerCount"></div>
+      <button class="delete-all-btn" id="deleteAllBtn">Delete all</button>
+    </div>
+  </header>
+
+  <div class="domain-columns" id="domainColumns">
+    <div class="loading" id="loading">Loading bookmarks…</div>
+  </div>
+
+  <div class="no-results hidden" id="no-results">No matching bookmarks found.</div>
+
+  <div class="footer-divider">
+    <div class="divider-line"></div>
+    <div class="divider-count" id="footerCount"></div>
+  </div>
+
+  <footer>
+    <span class="footer-credit">
+      <a href="https://github.com/tobrainto/bookmarks-by-domain" target="_top">Bookmarks by Domain</a> by <a href="https://x.com/tobrainto" target="_top">Tobrainto</a>
+    </span>
+  </footer>
+</div><!-- end .container -->
+
+<button class="scroll-top" id="scroll-top" title="Back to top">↑</button>
+
+<!-- Confirm Dialog -->
+<div class="confirm-overlay hidden" id="confirmOverlay">
+  <div class="confirm-dialog" id="confirmDialog">
+    <div class="confirm-title" id="confirmTitle"></div>
+    <div class="confirm-message" id="confirmMessage"></div>
+    <div class="confirm-actions">
+      <button class="confirm-btn-cancel" id="confirmCancel">Cancel</button>
+      <button class="confirm-btn-delete" id="confirmDelete">Delete</button>
+    </div>
+  </div>
+</div>
+
+<script src="page.js"></script>
+</body>
+</html>
